@@ -17,9 +17,11 @@ class QuizWindow(QMainWindow):
         self.setFont(QFont("Bebas Neue", 24))
         self.title_view = TitleView(self)
         self.topic_view = TopicView(self)
+        self.question_view = QuestionView(self)
 
         self.title_view.register_buttons(self)
         self.topic_view.register_buttons(self)
+        self.question_view.register_buttons(self)
         self.setCentralWidget(self.title_view)
 
     def switch_title_view(self):
@@ -29,6 +31,11 @@ class QuizWindow(QMainWindow):
     def switch_topic_view(self):
         self.centralWidget().setParent(None)
         self.setCentralWidget(self.topic_view)
+
+    def switch_question_view(self):
+        self.centralWidget().setParent(None)
+        self.question_view.reset()
+        self.setCentralWidget(self.question_view)
 
 class TitleView(QWidget):
     def __init__(self, parent=None):
@@ -66,6 +73,7 @@ class TitleView(QWidget):
 
     def register_buttons(self, window):
         self.topic_button.clicked.connect(window.switch_topic_view)
+        self.question_button.clicked.connect(window.switch_question_view)
         self.quit_button.clicked.connect(window.close)
 
 class TopicView(QWidget):
@@ -106,6 +114,8 @@ class TopicView(QWidget):
 
     def register_buttons(self, window):
         self.top_bar.register_buttons(window)
+        for button in self.topic_buttons:
+            button.clicked.connect(window.switch_question_view)
 
 class TopBar(QWidget):
     def __init__(self, parent=None):
@@ -125,6 +135,55 @@ class TopBar(QWidget):
     def register_buttons(self, window):
         self.menu_button.clicked.connect(window.switch_title_view)
         self.quit_button.clicked.connect(window.close)
+
+class QuestionView(QWidget):
+    def __init__(self, parent=None):
+        super().__init__(parent)
+        self.vbox = QVBoxLayout()
+        self.setLayout(self.vbox)
+        self.top_bar = TopBar(self)
+        self.vbox.addWidget(self.top_bar, 0)
+
+        self.question_container = QWidget(self)
+        self.vbox.addWidget(self.question_container, 1)
+
+        self.question_layout = QHBoxLayout(self.question_container)
+        self.question_widget = QLabel("filler text", self)
+        self.question_widget.setSizePolicy(
+            QSizePolicy.Policy.Preferred,
+            QSizePolicy.Policy.Preferred
+        )
+        self.question_layout.addWidget(self.question_widget, 1)
+
+        self.answer_button = QPushButton("CLICK TO SHOW\nMARK SCHEME")
+        self.answer_button.setFont(QFont("Bebas Neue", 48))
+        self.answer_button.setSizePolicy(
+            QSizePolicy.Policy.Preferred,
+            QSizePolicy.Policy.Preferred
+        )
+        self.answer_button.clicked.connect(self.show_mark_scheme)
+        self.question_layout.addWidget(self.answer_button, 1)
+
+        self.mark_scheme_widget = QLabel("mark scheme")
+        self.mark_scheme_widget.setSizePolicy(
+            QSizePolicy.Policy.Preferred,
+            QSizePolicy.Policy.Preferred
+        )
+
+    def show_mark_scheme(self):
+        widget = self.question_layout.itemAt(1).widget()
+        self.question_layout.removeWidget(widget)
+        widget.setParent(None)
+        self.question_layout.addWidget(self.mark_scheme_widget, 1)
+
+    def reset(self):
+        widget = self.question_layout.itemAt(1).widget()
+        self.question_layout.removeWidget(widget)
+        widget.setParent(None)
+        self.question_layout.addWidget(self.answer_button, 1)
+
+    def register_buttons(self, window):
+        self.top_bar.register_buttons(window)
 
 if __name__ == "__main__":
     app = QuizApplication(sys.argv)
