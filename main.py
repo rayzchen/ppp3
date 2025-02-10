@@ -3,11 +3,6 @@ from PySide6.QtWidgets import *
 from PySide6.QtGui import *
 import sys
 
-class QuizApplication(QApplication):
-    def __init__(self, argv):
-        super().__init__(argv)
-        self.window = QuizWindow()
-
 class QuizWindow(QMainWindow):
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -186,6 +181,7 @@ class QuestionView(QWidget):
         self.top_bar.register_buttons(window)
 
 if __name__ == "__main__":
-    app = QuizApplication(sys.argv)
-    app.window.show()
+    app = QApplication(sys.argv)
+    window = QuizWindow()
+    window.show()
     sys.exit(app.exec())
