@@ -10,12 +10,12 @@ questions = {}
 answers = {}
 topics = [
     "algorithms",
-    # "programming",
-    # "data representation",
-    # "computer hardware",
-    # "networks",
-    # "cyber security",
-    # "ethics"
+    "programming",
+    "data representation",
+    "computer hardware",
+    "networks",
+    "cyber security",
+    "ethics"
 ]
 
 def load_questions():
